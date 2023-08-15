@@ -339,42 +339,47 @@ Active inference is based on the free energy principle, which suggests that the 
 
 In summary, personalized nudging using active inference could be a powerful tool for improving adherence to an exercise plan. By taking into account individual differences and personalizing the nudges, it may be possible to achieve better outcomes than with traditional nudging approaches.
 
+
 \section{Personalizing Nudging}
 
 \subsection{Problem Formulation}
 
 We consider two agents interacting with each other: the \textbf{user} and the \textbf{assistant}.
-The goal of the assistant is to help the user adhering his objective in terms of physical activity. In this paper, we
+The goal of the assistant is to help the user adhering their objective in terms of physical activity. In this paper, we
  address the problem of the assistant point of view, which is to pick up an intervention $a \in \mathcal{A}$ that will
  help the learner to meet this objective.
 
-We assume that time is discrete.
-The timing of the teaching sessions is controlled by the learner.
-If the teaching process is not active at time $t$, the teacher cannot take any action: teaching is \textit{paused}, which we express as $a_t = 0$.
-Otherwise, the learner is in a \textit{teaching session}: the teacher suggests item $a_t \in \mathcal{A}$ and observes $\omega_t \in \lbrace 0, 1 \rbrace$, indicating whether the learner knows item $a_t$ at this point in time.
-In a practical example involving second-language vocabulary (e.g., German for an English-speaker), an item $a \in \mathcal{A}$ would be a word in the source and target languages (e.g., ``dog'' $\rightarrow$ ``Hund''); the source word (``dog'') is presented to the learner, who tries to respond with the target word (``Hund'').
-We use $\omega_t$ to indicate whether the response was correct ($\omega_t = 1$) or not ($\omega_t = 0$).
-
-Aiming to increase the learner's knowledge, the teacher sets learning objectives.
-In practice, this entails defining a final reward for the teacher to receive after all the teaching sessions are complete.
-The objective of the teacher is to maximize this reward, which depends on the actual memorization by the learner.
-
-Were the learner to have unbounded memory abilities, the optimal sequence of items would be to present each item once.
-In reality, human memorization is imperfect: the probability of recall of a previously seen item can be far lower than~1. Also, the learner's memory state is not known. The teacher must, therefore, rely on a memory model, which serves as a proxy for the learner's actual memorization state.
-This model $M$ is parameterized by $\theta$ in parameter space $\Theta^M$. The model defines a probability $p_M(\omega_t | a_{t}, H_{t-1}, \theta)$, for the \textit{probability of recall}, with $H_{t-1} = (a_1, \dotsc, a_{t-1})$ being the history up to time $t-1$. The probability of recall denotes the probability of item $a \in \mathcal{A}$ being retained by the learner under  memory model $M$.
-The teacher relies on a proxy reward $R(M, \theta, H_t)$ at time $t$ as an approximation for the actual reward. The optimization problem to be solved by the teacher is
-\begin{equation}
-    \text{arg}\max_{a_1, \dotsc, a_F \in \mathcal{A}} \quad R(M, \theta, H_F = (a_1, \dotsc, a_F))
-    \label{eqn:objective}
-\end{equation}
-where $F$ is the end date of the teaching.
-
+We assume that time is discrete. We assume a succession of phases, each of which is a \textit{active phase} or a
+\textit{passive phase}. During the active phase, the assistant can take an action $a \in \mathcal{A}$, which is to
+propose an intervention to the user. During the passive phase, the assistant cannot take any action.
+Each time step, regardless of the phase they are currently in, the assistant observes $o_t \in \mathbb{R}^N$,
+the part of the context which can be observed, such as the user behavior or the time of the day. There is also a part
+ of the context that the assistant cannot observe,
+$z_t \in \mathbb{R}^M$, such as the user intentions or motivation. The part of the context that is not observed is
+assumed to be a Markov process, i.e $z_{t+1} \prop p(z_{t+1} \mid z_t, a_t)$. However, we do not assume that this
+transition
+probability
+$p(z, a)$ is known by the assistant. The assistant would need to maintaining a belief $b_t$ over the probability
+distribution of transitioning from one state to another, that is $q(p(z_{t+1} \mid z_t, a_t))$.
 
 \subsection{Implementation using Active Inference}
+
+Using the active inference framework,
 
 \begin{equation}
 Q^*(\pi) \sim - \sum_{t}^{T} \mathbb E_{Q(o_t, z_t \mid \pi)} \left[\ln Q(z_t \mid \pi) - \ln \tilde p(o_t, z_t) \right]
 \end{equation}
+
+\begin{equation}
+    = \sum_{t}^{T}  \underbrace{ \mathbb E_{Q(o_t, z_t \mid \pi)} D_{KL}\left[ Q(z_t \mid o_t) || Q(z_t \mid \pi) \right] }_{ \text{epistemic value} }
+    + \underbrace{ \mathbb E_{Q(o_t \mid \pi) } \left[ \ln \tilde p(o_t) \right]}_{ \text{pragmatic value} } + \text{const}
+\end{equation}
+
+\section{Specific case of application: increasing the daily step count by offering money incentives for completing
+challenges}
+
+
+
 
 
 \section{Simulation Study}
@@ -391,6 +396,13 @@ Q^*(\pi) \sim - \sum_{t}^{T} \mathbb E_{Q(o_t, z_t \mid \pi)} \left[\ln Q(z_t \m
 \subsection{Procedure}
 
 \subsection{Results}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{}
+  \caption{}
+  \Description{}
+\end{figure}
 
 % \begin{figure}[h]
 %   \centering
